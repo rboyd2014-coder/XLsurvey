@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Xi Lambda Brotherhood Survey</title>
+  <style>
+    html, body { margin: 0; padding: 0; background: #0D0D0D; }
+    * { box-sizing: border-box; }
+  </style>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+</head>
+<body>
+  <div id="root"></div>
+  <script>
+const {
+  useState
+} = React;
+
+// ===== Your live Apps Script collector =====
+const SURVEY_ENDPOINT = "https://script.google.com/macros/s/AKfycby8HClnv5-vY7r5gHiOaAGUXq_ZdBQlBeSkn2jdPP0yYeR_KAzjIDFzHXuqsR00wGc/exec";
+const GOLD = "#C9A84C";
+const GOLD_LIGHT = "#E8C96A";
+const BLACK = "#0D0D0D";
+const WHITE = "#F5F3EE";
+const questions = [
+// ── CHAPTER SENTIMENT ───────────────────────────────────────────────────
+{
+  id: "sentiment_intro",
+  section: "Chapter Sentiment",
+  label: "The following questions help us understand how brothers experience Xi Lambda. Please answer honestly — your candor makes the chapter better.",
+  type: "info"
+}, {
+  id: "s_input",
+  section: "Chapter Sentiment",
+  label: "I feel like my input shapes the direction of this chapter.",
+  type: "rating",
+  group: "Inclusion & Investment"
+}, {
+  id: "s_ownership",
+  section: "Chapter Sentiment",
+  label: "I feel a sense of ownership in what this chapter does and how it operates.",
+  type: "rating",
+  group: "Inclusion & Investment"
+}, {
+  id: "s_presence",
+  section: "Chapter Sentiment",
+  label: "When I show up to chapter, I feel like my presence matters.",
+  type: "rating",
+  group: "Inclusion & Investment"
+}, {
+  id: "s_excellence",
+  section: "Chapter Sentiment",
+  label: "The chapter's events and programs reflect a standard of eXceLlence.",
+  type: "rating",
+  group: "Events & Programming"
+}, {
+  id: "s_programming",
+  section: "Chapter Sentiment",
+  label: "The chapter's programming reflects what I actually want to do as a brother.",
+  type: "rating",
+  group: "Events & Programming"
+}, {
+  id: "s_meetings",
+  section: "Chapter Sentiment",
+  label: "I feel like chapter meetings are a productive use of my time.",
+  type: "rating",
+  group: "Meetings"
+}, {
+  id: "s_roberts",
+  section: "Chapter Sentiment",
+  label: "How would you rate your working knowledge of Robert's Rules of Order?",
+  type: "selfassess",
+  group: "Meetings",
+  options: ["Novice", "Familiar", "Confident", "Expert"]
+}, {
+  id: "s_info",
+  section: "Chapter Sentiment",
+  label: "I know where to find information about chapter news, events, and updates.",
+  type: "rating",
+  group: "Communication & Visibility"
+}, {
+  id: "s_notice",
+  section: "Chapter Sentiment",
+  label: "Chapter communications give me enough notice to plan and participate.",
+  type: "rating",
+  group: "Communication & Visibility"
+}, {
+  id: "s_social",
+  section: "Chapter Sentiment",
+  label: "The chapter's social media channels keep me informed about what's happening.",
+  type: "rating",
+  group: "Communication & Visibility"
+}, {
+  id: "s_whotoask",
+  section: "Chapter Sentiment",
+  label: "I know which brothers to go to with questions or ideas for the chapter.",
+  type: "rating",
+  group: "Communication & Visibility"
+}, {
+  id: "s_belonging",
+  section: "Chapter Sentiment",
+  label: "I feel welcomed and supported when I re-engage with the chapter after time away.",
+  type: "rating",
+  group: "Membership & Belonging"
+}, {
+  id: "s_goodstanding",
+  section: "Chapter Sentiment",
+  label: "I understand what it means to be in Good Standing with the chapter and national organization.",
+  type: "rating",
+  group: "Chapter Knowledge"
+}, {
+  id: "s_committees",
+  section: "Chapter Sentiment",
+  label: "I have a clear understanding of what the chapter's committees do and how to get involved.",
+  type: "rating",
+  group: "Chapter Knowledge"
+},
+// ── SKILLS & TALENTS ────────────────────────────────────────────────────
+{
+  id: "skills",
+  section: "Skills & Talents",
+  label: "Which of these skills do you have that could benefit the chapter?",
+  subtitle: "Select all that apply.",
+  type: "multicheck",
+  options: ["Event Planning & Logistics", "Graphic Design / Creative", "Web / Tech / IT", "Writing / Communications", "Financial Planning / Accounting", "Legal / Compliance", "Fundraising / Grant Writing", "Public Speaking / Facilitation", "Mentorship / Coaching", "Photography / Videography", "Social Media / Marketing", "Project Management"]
+},
+// ── PERSONAL INTERESTS ──────────────────────────────────────────────────
+{
+  id: "interests",
+  section: "Personal Interests",
+  label: "What are your personal interests or hobbies?",
+  subtitle: "Select all that apply.",
+  type: "multicheck",
+  other: true,
+  options: ["Sports & Fandom (Chicago teams)", "Fitness (working out, running, biking)", "Cigars", "Music", "Travel", "Cooking / Food", "Reading / Writing", "Arts & Culture", "Community Activism", "Golf", "Gaming", "Faith & Spirituality", "Business / Investing", "Family & Parenting"]
+},
+// ── FINAL THOUGHTS ──────────────────────────────────────────────────────
+{
+  id: "service_priority",
+  section: "Final Thoughts",
+  label: "In your view, what area of service is most important in helping the Black community?",
+  subtitle: "Select up to 3.",
+  type: "multicheck",
+  max: 3,
+  other: true,
+  options: ["Education & Youth Development", "Economic Empowerment & Financial Literacy", "Health & Wellness", "Criminal Justice & Legal Reform", "Civic Engagement & Voting Rights", "Housing & Community Development", "Mentorship & Male Development", "Entrepreneurship & Business Development", "Mental Health & Emotional Wellness", "Family Stability & Fatherhood", "Environmental Justice", "Arts, Culture & Heritage"]
+}, {
+  id: "chapter_programming",
+  section: "Final Thoughts",
+  label: "What types of events or activities do you want to see more of in the chapter?",
+  subtitle: "Select all that apply.",
+  type: "multicheck",
+  other: true,
+  options: ["Community service projects", "Professional networking events", "Brotherhood social outings", "Educational forums & panel discussions", "Health & wellness activities", "Family-friendly events", "Fundraisers & galas", "Youth mentorship programs", "Cultural & arts experiences", "Financial literacy workshops", "Golf outings", "Sports & recreation", "Political & civic engagement", "Spiritual & faith-based programming"]
+}, {
+  id: "attend_more",
+  section: "Final Thoughts",
+  label: "What would make you more likely to attend meetings or events regularly?",
+  type: "textarea",
+  optional: true,
+  placeholder: "Be as specific as you'd like..."
+}, {
+  id: "do_well",
+  section: "Final Thoughts",
+  label: "What does Xi Lambda do well that we should do more of?",
+  type: "textarea",
+  optional: true,
+  placeholder: "Strengths worth building on..."
+}, {
+  id: "prioritize",
+  section: "Final Thoughts",
+  label: "What's one thing you wish the chapter would prioritize?",
+  type: "textarea",
+  optional: true,
+  placeholder: "Your honest answer helps us improve..."
+},
+// ── PROFESSIONAL BACKGROUND ─────────────────────────────────────────────
+{
+  id: "employment_status",
+  section: "Professional Background",
+  label: "What is your current employment status?",
+  type: "radio",
+  options: ["Employed full-time", "Employed part-time", "Self-employed / Business owner", "Unemployed / Underemployed", "Retired"]
+}, {
+  id: "industry",
+  section: "Professional Background",
+  label: "What industry do you work (or worked) in?",
+  type: "select",
+  options: ["Education / Academia", "Law / Legal Services", "Healthcare / Medicine", "Finance / Banking / Investment", "Technology / Engineering", "Government / Public Policy", "Nonprofit / Social Services", "Business / Entrepreneurship", "Media / Communications / Marketing", "Real Estate / Construction", "Military / Veterans Services", "Skilled Trades", "Transportation / Logistics", "Other"]
+}, {
+  id: "profession",
+  section: "Professional Background",
+  label: "What is your current or most recent role or title?",
+  type: "text",
+  placeholder: "e.g. Attorney, Retired Principal, Software Engineer"
+}, {
+  id: "linkedin",
+  section: "Professional Background",
+  label: "LinkedIn Profile URL",
+  subtitle: "Optional — helps us build out the membership database.",
+  type: "text",
+  optional: true,
+  placeholder: "https://linkedin.com/in/yourname"
+},
+// ── INVOLVEMENT ─────────────────────────────────────────────────────────
+{
+  id: "committee_commitment",
+  section: "Involvement",
+  label: "Select the 2 committees you are committing to serve on this fraternal year.",
+  subtitle: "This is a commitment to active participation for the duration of the year. You may join additional committees, but these 2 are where we are counting on you. Select exactly 2.",
+  type: "multicheck",
+  max: 2,
+  min: 2,
+  options: [{
+    label: "Adopt a Senior",
+    desc: "Provides support and companionship to senior citizens in our community"
+  }, {
+    label: "Alpha Walk",
+    desc: "Organizes and coordinates the chapter's signature walk program"
+  }, {
+    label: "Alphanomics",
+    desc: "Promotes financial literacy and economic empowerment"
+  }, {
+    label: "Big Brother Big Sisters",
+    desc: "Mentorship program pairing brothers with youth in the community"
+  }, {
+    label: "Brothers Keeper",
+    desc: "Supports the health, welfare, and accountability of chapter members"
+  }, {
+    label: "Budget & Finance",
+    desc: "Oversees chapter financial planning, budgeting, and fiscal operations"
+  }, {
+    label: "Community Programs",
+    desc: "Plans and implements service activities for the broader community"
+  }, {
+    label: "Constitution",
+    desc: "Reviews and interprets chapter and general constitution and by-laws"
+  }, {
+    label: "Conventions",
+    desc: "Plans and coordinates the chapter's participation in fraternity conventions"
+  }, {
+    label: "Distinguished Lecturer",
+    desc: "Organizes lectures and public forums featuring notable speakers"
+  }, {
+    label: "Educational Activities",
+    desc: "Plans and implements Go to High School, Go to College and related programs"
+  }, {
+    label: "Elections",
+    desc: "Supervises and administers the chapter's annual election process"
+  }, {
+    label: "Events & Fellowship",
+    desc: "Plans major chapter affairs and social activities that build brotherhood"
+  }, {
+    label: "Fundraising",
+    desc: "Leads activities that raise funds for chapter projects and national programs"
+  }, {
+    label: "IMDP",
+    desc: "Supports Initial Membership Development and new member integration"
+  }, {
+    label: "Membership",
+    desc: "Supports member onboarding, engagement, reclamation, and retention"
+  }, {
+    label: "NPHC",
+    desc: "Represents the chapter within the National Pan-Hellenic Council"
+  }, {
+    label: "Prayer Breakfast",
+    desc: "Plans and executes the chapter's annual prayer breakfast"
+  }, {
+    label: "Project Alpha",
+    desc: "Male youth development program addressing health and life skills"
+  }, {
+    label: "Publicity",
+    desc: "Manages chapter communications, media relations, and public presence"
+  }, {
+    label: "Scholarship Showcase",
+    desc: "Plans and implements the chapter's scholarship recognition program"
+  }, {
+    label: "Space Management",
+    desc: "Oversees the eXceL Center and chapter meeting space policies"
+  }, {
+    label: "Technology",
+    desc: "Supports the chapter's digital infrastructure, tools, and online presence"
+  }, {
+    label: "VPHP",
+    desc: "Supports voter registration, civic engagement, and political empowerment"
+  }]
+}, {
+  id: "business_services",
+  section: "Involvement",
+  label: "Do you own a business or have access to services that could benefit the brotherhood or our community?",
+  subtitle: "e.g. catering, legal counsel, printing, financial advising, event space, transportation, construction, healthcare. Optional but valuable.",
+  type: "textarea",
+  optional: true,
+  placeholder: "Describe the business or service and how brothers can access it..."
+}, {
+  id: "affiliations",
+  section: "Involvement",
+  label: "Do you have memberships, affiliations, or connections to any organizations, venues, or networks that could open doors for the chapter?",
+  subtitle: "e.g. civic organizations, faith communities, professional associations, social clubs, union affiliations, venue access, Greek-letter organizations, political networks. Optional — share only what you're comfortable with.",
+  type: "textarea",
+  optional: true,
+  placeholder: "List any organizations, venues, or networks and how they might be useful..."
+}, {
+  id: "meeting_availability",
+  section: "Involvement",
+  label: "Which weekday evenings and start times work best for you for chapter meetings?",
+  subtitle: "Select all that apply.",
+  type: "multicheck",
+  options: ["Monday 6pm", "Monday 7pm", "Monday 8pm", "Monday 9pm", "Tuesday 6pm", "Tuesday 7pm", "Tuesday 8pm", "Tuesday 9pm", "Wednesday 6pm", "Wednesday 7pm", "Wednesday 8pm", "Wednesday 9pm", "Thursday 6pm", "Thursday 7pm", "Thursday 8pm", "Thursday 9pm", "Friday 6pm", "Friday 7pm", "Friday 8pm", "Friday 9pm"]
+},
+// ── CONTACT INFO (last) ─────────────────────────────────────────────────
+{
+  id: "name",
+  section: "Contact Info",
+  label: "Full Name",
+  type: "text",
+  placeholder: "First and Last Name"
+}, {
+  id: "phone",
+  section: "Contact Info",
+  label: "Cell Phone Number",
+  type: "text",
+  placeholder: "e.g. (312) 555-0100"
+}, {
+  id: "zip_code",
+  section: "Contact Info",
+  label: "Home ZIP Code",
+  subtitle: "Helps us understand where brothers are located and coordinate mutual aid.",
+  type: "text",
+  placeholder: "e.g. 60620"
+}];
+const sections = [...new Set(questions.map(q => q.section))];
+const RATING_LABELS = {
+  1: "Strongly Disagree",
+  2: "Disagree",
+  3: "Neutral",
+  4: "Agree",
+  5: "Strongly Agree"
+};
+
+// A question counts as required unless it's an info block or flagged optional.
+function isRequired(q) {
+  return q.type !== "info" && !q.optional;
+}
+
+// Whether a given question has a valid answer.
+function isAnswered(q, answers) {
+  const val = answers[q.id];
+  if (q.type === "multicheck") {
+    const arr = Array.isArray(val) ? val : [];
+    if (q.min === 2) return arr.length === 2;
+    if (arr.length < 1) return false;
+    // If "Other" is chosen, the specify box must be filled in.
+    if (q.other && arr.includes("Other")) {
+      const other = answers[q.id + "_other"];
+      return typeof other === "string" && other.trim() !== "";
+    }
+    return true;
+  }
+  if (q.type === "rating") return val !== undefined && val !== null && val !== "";
+  if (typeof val === "string") return val.trim() !== "";
+  return val !== undefined && val !== null;
+}
+function Survey() {
+  const [answers, setAnswers] = useState({});
+  const [submitted, setSubmitted] = useState(false);
+  const [activeSection, setActiveSection] = useState(0);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState(false);
+  const [missing, setMissing] = useState([]);
+  const [showWelcome, setShowWelcome] = useState(true);
+  const currentSection = sections[activeSection];
+  const currentQuestions = questions.filter(q => q.section === currentSection);
+  const isLast = activeSection === sections.length - 1;
+  function handleText(id, val) {
+    setAnswers(a => ({
+      ...a,
+      [id]: val
+    }));
+  }
+  function handleRadio(id, val) {
+    setAnswers(a => ({
+      ...a,
+      [id]: val
+    }));
+  }
+  function handleRating(id, val) {
+    setAnswers(a => ({
+      ...a,
+      [id]: val
+    }));
+  }
+  function handleCheck(id, val, max) {
+    setAnswers(a => {
+      const prev = a[id] || [];
+      if (prev.includes(val)) return {
+        ...a,
+        [id]: prev.filter(v => v !== val)
+      };
+      if (max && prev.length >= max) return a;
+      return {
+        ...a,
+        [id]: [...prev, val]
+      };
+    });
+  }
+
+  // Show a red cue only while a required question is still unanswered.
+  const showMiss = q => missing.includes(q.id) && !isAnswered(q, answers);
+  const liveMissing = missing.filter(id => {
+    const q = questions.find(x => x.id === id);
+    return q && !isAnswered(q, answers);
+  });
+
+  // Build the payload in survey order so the Sheet columns line up cleanly,
+  // then POST to the collector. text/plain body avoids a CORS preflight.
+  async function submitSurvey() {
+    const payload = {};
+    questions.forEach(q => {
+      if (q.type === "info") return;
+      const v = answers[q.id];
+      payload[q.id] = v === undefined ? "" : v;
+      if (q.other) {
+        const o = answers[q.id + "_other"];
+        payload[q.id + "_other"] = o === undefined ? "" : o;
+      }
+    });
+    await fetch(SURVEY_ENDPOINT, {
+      method: "POST",
+      mode: "no-cors",
+      body: JSON.stringify(payload)
+    });
+  }
+  async function handleNext() {
+    // Gate on required questions in this section before moving on.
+    const gaps = currentQuestions.filter(q => isRequired(q) && !isAnswered(q, answers)).map(q => q.id);
+    if (gaps.length) {
+      setMissing(gaps);
+      setTimeout(() => {
+        const el = document.getElementById("q-" + gaps[0]);
+        if (el) el.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+      }, 50);
+      return;
+    }
+    setMissing([]);
+    if (!isLast) {
+      setActiveSection(s => s + 1);
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+      return;
+    }
+    setError(false);
+    setSending(true);
+    try {
+      await submitSurvey();
+      setSubmitted(true);
+    } catch (e) {
+      setError(true);
+    } finally {
+      setSending(false);
+    }
+  }
+  function handleBack() {
+    setMissing([]);
+    setActiveSection(s => s - 1);
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+  const progress = (activeSection + 1) / sections.length * 100;
+
+  // Group sentiment questions by their group label
+  const groupedSentiment = qs => {
+    const groups = [];
+    const seen = new Set();
+    qs.forEach(q => {
+      if (!q.group) return;
+      if (!seen.has(q.group)) {
+        seen.add(q.group);
+        groups.push(q.group);
+      }
+    });
+    return groups;
+  };
+  if (showWelcome) {
+    return /*#__PURE__*/React.createElement("div", {
+      style: styles.page
+    }, /*#__PURE__*/React.createElement("div", {
+      style: styles.header
+    }, /*#__PURE__*/React.createElement("div", {
+      style: styles.headerInner
+    }, /*#__PURE__*/React.createElement("span", {
+      style: styles.crestSmall
+    }, "ΞΛ"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      style: styles.headerTitle
+    }, "Xi Lambda Chapter"), /*#__PURE__*/React.createElement("div", {
+      style: styles.headerSub
+    }, "Brotherhood Survey · ", new Date().getFullYear())))), /*#__PURE__*/React.createElement("div", {
+      style: styles.card
+    }, /*#__PURE__*/React.createElement("div", {
+      style: styles.crest
+    }, "ΞΛ"), /*#__PURE__*/React.createElement("p", {
+      style: styles.welcomeText
+    }, "Help us know the brotherhood. This quick survey shapes how we serve you and our community this year. Complete by ", /*#__PURE__*/React.createElement("strong", {
+      style: {
+        color: GOLD_LIGHT
+      }
+    }, "Friday, Sept. 5th"), " — and share it with your XL brothers."), /*#__PURE__*/React.createElement("p", {
+      style: styles.welcomeText
+    }, "In honor of 1924, every 24th brother to finish (24th, 124th, 224th…) wins a gift card. 🎁"), /*#__PURE__*/React.createElement("button", {
+      style: {
+        ...styles.btn,
+        marginTop: 24
+      },
+      onClick: () => setShowWelcome(false)
+    }, "Begin Survey →")), /*#__PURE__*/React.createElement("div", {
+      style: styles.footer
+    }, "Alpha Phi Alpha Fraternity, Inc. · Xi Lambda Chapter · Chicago, IL · Est. 1924"));
+  }
+  if (submitted) {
+    return /*#__PURE__*/React.createElement("div", {
+      style: styles.page
+    }, /*#__PURE__*/React.createElement("div", {
+      style: styles.card
+    }, /*#__PURE__*/React.createElement("div", {
+      style: styles.crest
+    }, "ΞΛ"), /*#__PURE__*/React.createElement("h2", {
+      style: styles.thankTitle
+    }, "Thank you, Brother."), /*#__PURE__*/React.createElement("p", {
+      style: styles.thankText
+    }, "Your responses help the Membership Committee build programs that truly serve the brotherhood. We appreciate you taking the time."), /*#__PURE__*/React.createElement("p", {
+      style: {
+        ...styles.thankText,
+        color: GOLD,
+        fontStyle: "italic",
+        marginTop: 8
+      }
+    }, "— Xi Lambda Chapter, est. 1924")));
+  }
+  const isSentimentSection = currentSection === "Chapter Sentiment";
+  return /*#__PURE__*/React.createElement("div", {
+    style: styles.page
+  }, /*#__PURE__*/React.createElement("div", {
+    style: styles.header
+  }, /*#__PURE__*/React.createElement("div", {
+    style: styles.headerInner
+  }, /*#__PURE__*/React.createElement("span", {
+    style: styles.crestSmall
+  }, "ΞΛ"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: styles.headerTitle
+  }, "Xi Lambda Chapter"), /*#__PURE__*/React.createElement("div", {
+    style: styles.headerSub
+  }, "Brotherhood Survey · ", new Date().getFullYear())))), /*#__PURE__*/React.createElement("div", {
+    style: styles.progressBar
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      ...styles.progressFill,
+      width: `${progress}%`
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: styles.sectionNav
+  }, sections.map((s, i) => /*#__PURE__*/React.createElement("div", {
+    key: s,
+    style: {
+      ...styles.sectionDot,
+      background: i <= activeSection ? GOLD : "#333",
+      transform: i === activeSection ? "scale(1.3)" : "scale(1)"
+    },
+    title: s
+  }))), /*#__PURE__*/React.createElement("div", {
+    style: styles.card
+  }, /*#__PURE__*/React.createElement("div", {
+    style: styles.sectionLabel
+  }, currentSection), isSentimentSection ?
+  // Render sentiment section with group headers
+  (() => {
+    const infoQ = currentQuestions.find(q => q.type === "info");
+    const ratingQs = currentQuestions.filter(q => q.type === "rating" || q.type === "selfassess");
+    const groups = groupedSentiment(ratingQs);
+    return /*#__PURE__*/React.createElement(React.Fragment, null, infoQ && /*#__PURE__*/React.createElement("div", {
+      style: styles.infoBox
+    }, infoQ.label), groups.map(group => /*#__PURE__*/React.createElement("div", {
+      key: group,
+      style: styles.sentimentGroup
+    }, /*#__PURE__*/React.createElement("div", {
+      style: styles.groupHeader
+    }, group), ratingQs.filter(q => q.group === group).map(q => /*#__PURE__*/React.createElement("div", {
+      key: q.id,
+      id: "q-" + q.id,
+      style: {
+        ...styles.question,
+        ...(showMiss(q) ? styles.questionMissing : {})
+      }
+    }, /*#__PURE__*/React.createElement("label", {
+      style: styles.qLabel
+    }, q.label), q.type === "rating" && /*#__PURE__*/React.createElement("div", {
+      style: styles.ratingRow
+    }, [1, 2, 3, 4, 5].map(n => {
+      const selected = answers[q.id] === n;
+      return /*#__PURE__*/React.createElement("div", {
+        key: n,
+        style: styles.ratingCol,
+        onClick: () => handleRating(q.id, n)
+      }, /*#__PURE__*/React.createElement("div", {
+        style: {
+          ...styles.ratingBtn,
+          background: selected ? GOLD : "#1e1e1e",
+          color: selected ? BLACK : "#888",
+          border: selected ? `2px solid ${GOLD}` : "1px solid #333",
+          fontWeight: selected ? "bold" : "normal"
+        }
+      }, n), /*#__PURE__*/React.createElement("div", {
+        style: {
+          ...styles.ratingLbl,
+          color: selected ? GOLD : "#555"
+        }
+      }, RATING_LABELS[n]));
+    })), q.type === "selfassess" && /*#__PURE__*/React.createElement("div", {
+      style: styles.optionGroup
+    }, q.options.map(o => {
+      const selected = answers[q.id] === o;
+      return /*#__PURE__*/React.createElement("div", {
+        key: o,
+        style: {
+          ...styles.optionPill,
+          ...(selected ? styles.optionSelected : {})
+        },
+        onClick: () => handleRadio(q.id, o)
+      }, /*#__PURE__*/React.createElement("span", {
+        style: {
+          ...styles.optionDot,
+          background: selected ? GOLD : "#444"
+        }
+      }), o);
+    })))))));
+  })() :
+  // Render all other sections normally
+  currentQuestions.map(q => /*#__PURE__*/React.createElement("div", {
+    key: q.id,
+    id: "q-" + q.id,
+    style: {
+      ...styles.question,
+      ...(showMiss(q) ? styles.questionMissing : {})
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    style: styles.qLabel
+  }, q.label, q.subtitle && /*#__PURE__*/React.createElement("span", {
+    style: styles.qSub
+  }, " — ", q.subtitle)), q.type === "text" && /*#__PURE__*/React.createElement("input", {
+    style: styles.input,
+    placeholder: q.placeholder,
+    value: answers[q.id] || "",
+    onChange: e => handleText(q.id, e.target.value)
+  }), q.type === "textarea" && /*#__PURE__*/React.createElement("textarea", {
+    style: {
+      ...styles.input,
+      height: 100,
+      resize: "vertical"
+    },
+    placeholder: q.placeholder,
+    value: answers[q.id] || "",
+    onChange: e => handleText(q.id, e.target.value)
+  }), q.type === "select" && /*#__PURE__*/React.createElement("select", {
+    style: {
+      ...styles.input,
+      cursor: "pointer"
+    },
+    value: answers[q.id] || "",
+    onChange: e => handleText(q.id, e.target.value)
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "Select one..."), q.options.map(o => /*#__PURE__*/React.createElement("option", {
+    key: o,
+    value: o
+  }, o))), q.type === "radio" && /*#__PURE__*/React.createElement("div", {
+    style: styles.optionGroup
+  }, q.options.map(o => {
+    const selected = answers[q.id] === o;
+    return /*#__PURE__*/React.createElement("div", {
+      key: o,
+      style: {
+        ...styles.optionPill,
+        ...(selected ? styles.optionSelected : {})
+      },
+      onClick: () => handleRadio(q.id, o)
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        ...styles.optionDot,
+        background: selected ? GOLD : "#444"
+      }
+    }), o);
+  })), q.type === "multicheck" && (() => {
+    const hasDesc = q.options[0]?.desc;
+    const selected = answers[q.id] || [];
+    const isCommitment = q.min === 2;
+    return /*#__PURE__*/React.createElement(React.Fragment, null, isCommitment && /*#__PURE__*/React.createElement("div", {
+      style: {
+        ...styles.commitCounter,
+        color: selected.length === 2 ? GOLD : "#666",
+        borderColor: selected.length === 2 ? GOLD : "#333"
+      }
+    }, selected.length === 2 ? "✓ 2 of 2 committees selected — commitment recorded" : `${selected.length} of 2 selected — choose ${2 - selected.length} more`), /*#__PURE__*/React.createElement("div", {
+      style: hasDesc ? styles.checkList : styles.checkGrid
+    }, q.options.map(o => {
+      const val = o.label || o;
+      const checked = selected.includes(val);
+      const maxed = q.max && selected.length >= q.max && !checked;
+      return /*#__PURE__*/React.createElement("div", {
+        key: val,
+        style: {
+          ...(hasDesc ? styles.checkPillWide : styles.checkPill),
+          ...(checked ? styles.checkSelected : {}),
+          opacity: maxed ? 0.4 : 1,
+          cursor: maxed ? "not-allowed" : "pointer"
+        },
+        onClick: () => !maxed && handleCheck(q.id, val, q.max)
+      }, /*#__PURE__*/React.createElement("span", {
+        style: {
+          ...styles.checkBox,
+          flexShrink: 0,
+          marginTop: hasDesc ? 2 : 0
+        }
+      }, checked && /*#__PURE__*/React.createElement("span", {
+        style: styles.checkMark
+      }, "✓")), /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("span", {
+        style: {
+          fontWeight: "bold"
+        }
+      }, val), o.desc && /*#__PURE__*/React.createElement("span", {
+        style: styles.checkDesc
+      }, " — ", o.desc)));
+    }), q.other && (() => {
+      const checked = selected.includes("Other");
+      const maxed = q.max && selected.length >= q.max && !checked;
+      return /*#__PURE__*/React.createElement("div", {
+        style: {
+          ...styles.checkPill,
+          ...(checked ? styles.checkSelected : {}),
+          opacity: maxed ? 0.4 : 1,
+          cursor: maxed ? "not-allowed" : "pointer"
+        },
+        onClick: () => !maxed && handleCheck(q.id, "Other", q.max)
+      }, /*#__PURE__*/React.createElement("span", {
+        style: {
+          ...styles.checkBox,
+          flexShrink: 0
+        }
+      }, checked && /*#__PURE__*/React.createElement("span", {
+        style: styles.checkMark
+      }, "✓")), /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("span", {
+        style: {
+          fontWeight: "bold"
+        }
+      }, "Other")));
+    })()), q.other && selected.includes("Other") && /*#__PURE__*/React.createElement("input", {
+      style: {
+        ...styles.input,
+        marginTop: 8
+      },
+      placeholder: "Please specify...",
+      value: answers[q.id + "_other"] || "",
+      onChange: e => handleText(q.id + "_other", e.target.value)
+    }));
+  })())), liveMissing.length > 0 && /*#__PURE__*/React.createElement("div", {
+    style: styles.reqBanner
+  }, liveMissing.length === 1 ? "1 required question above needs an answer — it's outlined in gold." : `${liveMissing.length} required questions above need answers — they're outlined in gold.`), /*#__PURE__*/React.createElement("button", {
+    style: {
+      ...styles.btn,
+      opacity: sending ? 0.6 : 1,
+      cursor: sending ? "default" : "pointer"
+    },
+    onClick: handleNext,
+    disabled: sending
+  }, isLast ? sending ? "Submitting…" : "Submit Survey" : "Continue →"), error && /*#__PURE__*/React.createElement("div", {
+    style: styles.errorMsg
+  }, "Something interrupted your submission. Please tap Submit Survey again."), activeSection > 0 && !sending && /*#__PURE__*/React.createElement("button", {
+    style: styles.backBtn,
+    onClick: handleBack
+  }, "← Back")), /*#__PURE__*/React.createElement("div", {
+    style: styles.footer
+  }, "Alpha Phi Alpha Fraternity, Inc. · Xi Lambda Chapter · Chicago, IL · Est. 1924"));
+}
+const styles = {
+  page: {
+    minHeight: "100vh",
+    background: BLACK,
+    fontFamily: "'Georgia', serif",
+    color: WHITE,
+    paddingBottom: 60
+  },
+  header: {
+    background: "#111",
+    borderBottom: `2px solid ${GOLD}`,
+    padding: "16px 24px"
+  },
+  headerInner: {
+    maxWidth: 640,
+    margin: "0 auto",
+    display: "flex",
+    alignItems: "center",
+    gap: 14
+  },
+  crestSmall: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: GOLD,
+    letterSpacing: 2
+  },
+  headerTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: WHITE,
+    letterSpacing: 1
+  },
+  headerSub: {
+    fontSize: 11,
+    color: "#888",
+    letterSpacing: 2,
+    textTransform: "uppercase",
+    marginTop: 2
+  },
+  progressBar: {
+    height: 4,
+    background: "#222"
+  },
+  progressFill: {
+    height: "100%",
+    background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`,
+    transition: "width 0.4s ease"
+  },
+  sectionNav: {
+    display: "flex",
+    justifyContent: "center",
+    gap: 8,
+    padding: "16px 0 0"
+  },
+  sectionDot: {
+    width: 8,
+    height: 8,
+    borderRadius: "50%",
+    transition: "all 0.3s ease"
+  },
+  card: {
+    maxWidth: 640,
+    margin: "24px auto",
+    background: "#161616",
+    border: "1px solid #2a2a2a",
+    borderRadius: 12,
+    padding: "32px 28px"
+  },
+  sectionLabel: {
+    fontSize: 11,
+    letterSpacing: 4,
+    textTransform: "uppercase",
+    color: GOLD,
+    marginBottom: 24,
+    borderBottom: "1px solid #2a2a2a",
+    paddingBottom: 12
+  },
+  infoBox: {
+    background: "#1a1a0e",
+    border: `1px solid ${GOLD}33`,
+    borderRadius: 8,
+    padding: "14px 16px",
+    fontSize: 14,
+    color: "#bbb",
+    lineHeight: 1.6,
+    marginBottom: 28,
+    fontStyle: "italic"
+  },
+  sentimentGroup: {
+    marginBottom: 32
+  },
+  groupHeader: {
+    fontSize: 11,
+    letterSpacing: 3,
+    textTransform: "uppercase",
+    color: GOLD,
+    marginBottom: 16,
+    paddingBottom: 8,
+    borderBottom: "1px solid #222"
+  },
+  question: {
+    marginBottom: 28
+  },
+  questionMissing: {
+    borderLeft: `3px solid ${GOLD}`,
+    paddingLeft: 12,
+    marginLeft: -15
+  },
+  qLabel: {
+    display: "block",
+    fontSize: 15,
+    fontWeight: "bold",
+    color: WHITE,
+    marginBottom: 10,
+    lineHeight: 1.4
+  },
+  qSub: {
+    fontWeight: "normal",
+    color: "#888",
+    fontSize: 13,
+    fontStyle: "italic"
+  },
+  input: {
+    width: "100%",
+    background: "#1e1e1e",
+    border: "1px solid #333",
+    borderRadius: 6,
+    padding: "10px 14px",
+    color: WHITE,
+    fontSize: 14,
+    fontFamily: "Georgia, serif",
+    outline: "none",
+    boxSizing: "border-box"
+  },
+  optionGroup: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 8
+  },
+  optionPill: {
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    padding: "10px 14px",
+    background: "#1e1e1e",
+    border: "1px solid #333",
+    borderRadius: 6,
+    cursor: "pointer",
+    fontSize: 14,
+    transition: "all 0.15s"
+  },
+  optionSelected: {
+    border: `1px solid ${GOLD}`,
+    background: "#1f1a0e",
+    color: GOLD_LIGHT
+  },
+  optionDot: {
+    width: 10,
+    height: 10,
+    borderRadius: "50%",
+    flexShrink: 0,
+    transition: "background 0.15s"
+  },
+  ratingRow: {
+    display: "flex",
+    gap: 6
+  },
+  ratingCol: {
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 6,
+    cursor: "pointer"
+  },
+  ratingBtn: {
+    width: "100%",
+    textAlign: "center",
+    padding: "10px 0",
+    borderRadius: 6,
+    fontSize: 16,
+    transition: "all 0.15s"
+  },
+  ratingLbl: {
+    fontSize: 9,
+    textAlign: "center",
+    letterSpacing: 0.3,
+    lineHeight: 1.2,
+    transition: "color 0.15s"
+  },
+  commitCounter: {
+    fontSize: 12,
+    padding: "8px 12px",
+    border: "1px solid",
+    borderRadius: 6,
+    marginBottom: 10,
+    letterSpacing: 0.5,
+    transition: "all 0.2s"
+  },
+  checkList: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 8
+  },
+  checkGrid: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: 8
+  },
+  checkPill: {
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+    padding: "9px 12px",
+    background: "#1e1e1e",
+    border: "1px solid #333",
+    borderRadius: 6,
+    cursor: "pointer",
+    fontSize: 13,
+    transition: "all 0.15s"
+  },
+  checkPillWide: {
+    display: "flex",
+    alignItems: "flex-start",
+    gap: 10,
+    padding: "11px 14px",
+    background: "#1e1e1e",
+    border: "1px solid #333",
+    borderRadius: 6,
+    cursor: "pointer",
+    fontSize: 13,
+    lineHeight: 1.5,
+    transition: "all 0.15s"
+  },
+  checkSelected: {
+    border: `1px solid ${GOLD}`,
+    background: "#1f1a0e",
+    color: GOLD_LIGHT
+  },
+  checkDesc: {
+    fontWeight: "normal",
+    color: "#888",
+    fontStyle: "italic"
+  },
+  checkBox: {
+    width: 16,
+    height: 16,
+    border: "1px solid #555",
+    borderRadius: 3,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    background: "#111"
+  },
+  checkMark: {
+    fontSize: 11,
+    color: GOLD,
+    fontWeight: "bold"
+  },
+  btn: {
+    marginTop: 8,
+    width: "100%",
+    padding: "14px",
+    background: GOLD,
+    color: BLACK,
+    border: "none",
+    borderRadius: 6,
+    fontSize: 15,
+    fontWeight: "bold",
+    fontFamily: "Georgia, serif",
+    cursor: "pointer",
+    letterSpacing: 1
+  },
+  backBtn: {
+    marginTop: 10,
+    width: "100%",
+    padding: "10px",
+    background: "transparent",
+    color: "#666",
+    border: "1px solid #2a2a2a",
+    borderRadius: 6,
+    fontSize: 13,
+    fontFamily: "Georgia, serif",
+    cursor: "pointer"
+  },
+  reqBanner: {
+    color: GOLD_LIGHT,
+    fontSize: 13,
+    textAlign: "center",
+    marginTop: 4,
+    marginBottom: 4,
+    lineHeight: 1.5
+  },
+  errorMsg: {
+    color: "#e57373",
+    fontSize: 13,
+    textAlign: "center",
+    marginTop: 12,
+    lineHeight: 1.5
+  },
+  crest: {
+    fontSize: 56,
+    fontWeight: "bold",
+    color: GOLD,
+    textAlign: "center",
+    letterSpacing: 4,
+    marginBottom: 16
+  },
+  thankTitle: {
+    fontSize: 26,
+    textAlign: "center",
+    color: WHITE,
+    margin: "0 0 16px"
+  },
+  thankText: {
+    fontSize: 15,
+    color: "#aaa",
+    textAlign: "center",
+    lineHeight: 1.7,
+    margin: 0
+  },
+  footer: {
+    textAlign: "center",
+    fontSize: 11,
+    color: "#444",
+    letterSpacing: 2,
+    textTransform: "uppercase",
+    marginTop: 32
+  },
+  welcomeText: {
+    fontSize: 15,
+    color: "#bbb",
+    textAlign: "center",
+    lineHeight: 1.8,
+    margin: "0 0 12px"
+  }
+};
+ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.createElement(Survey, null));
+
+  </script>
+</body>
+</html>
